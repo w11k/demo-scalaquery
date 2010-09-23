@@ -19,6 +19,9 @@ class DemoScalaQueryProject(info: ProjectInfo) extends DefaultProject(info) {
   val scalaQuery = "org.scalaquery" %% "scalaquery" % "0.9.0" withSources
   val slf4s = "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.1" withSources
 
+  val h2 = "com.h2database" % "h2" % "1.2.140"
+  val postgresql = "postgresql" % "postgresql" % "8.4-701.jdbc4"
+  
   // Provided
   val slf4jJdk14 = "org.slf4j" % "slf4j-jdk14" % "1.6.1" % "provided" intransitive
 
