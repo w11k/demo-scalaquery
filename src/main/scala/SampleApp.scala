@@ -19,24 +19,20 @@ object SampleApp extends Application with Logging {
     /* Creating tables */
     val DDL = Person.ddl ++ Address.ddl
     DDL.create
-    DDL.createStatements.foreach(logger info(_))
+    DDL.createStatements foreach { logger info _ }
 
-    logger info ("Filling tables...")
-    Person.first ~
-    Person.last insertAll (
-      ( "John", "Doe" ),
-      ( "John", "Doe" ),
-      ( "Bobby", "Tables" ),
-      ( "Max", "Mustermann" ),
-      ( "Hans", "Wurst" ),
-      ( "Marcel", "Meier" ),
-      ( "Scala", "Johanson")
+    logger info "Filling tables..."
+    Person.first ~ Person.last insertAll (
+      ("John", "Doe"),
+      ("John", "Doe"),
+      ("Bobby", "Tables"),
+      ("Max", "Mustermann"),
+      ("Hans", "Wurst"),
+      ("Marcel", "Meier"),
+      ("Scala", "Johanson")
     )
 
-    Address.personId ~
-    Address.street ~
-    Address.zipCode ~
-    Address.location insertAll (
+    Address.personId ~ Address.street ~ Address.zipCode ~ Address.location insertAll (
       (1, "Musterstr. 22", "12345", "Musterhausen"),
       (3, "Musterstr. 21", "12345", "Musterhausen"),
       (2, "Maxstr. 11", "12345", "Musterhausen"),
@@ -49,31 +45,31 @@ object SampleApp extends Application with Logging {
     /* SELECT * FROM person; */
     val query1 = for { person <- Person } yield person
 
-    logger info ("Executing: " + query1.selectStatement)
+    logger info "Executing: %s".format(query1.selectStatement)
     //query1 foreach { println }
 
     /* SELECT first FROM person; */
     val query2 = for { person <- Person } yield person.first
 
-    logger info ("Executing: " + query2.selectStatement)
+    logger info "Executing: %s".format(query2.selectStatement)
     //query2 foreach { println }
 
     /* SELECT last FROM person order By last DESC; */
     val query3 = for {
-      person <- Person;
+      person <- Person; // TODO IDEA needs semicolon!
       _ <- Query orderBy person.last.desc
     } yield person.last
 
-    logger info ("Executing: " + query3.selectStatement)
+    logger info "Executing: %s".format(query3.selectStatement)
     //query3 foreach { println }
 
     /* SELECT first FROM person group by first; */
     val query4 = for {
-      person <- Person;
+      person <- Person; // TODO IDEA needs semicolon!
       _ <- Query groupBy person.first 
     } yield person.first
 
-    logger info ("Executing: " + query4.selectStatement)
+    logger info "Executing: %s".format(query4.selectStatement)
     //query4 foreach { println }
 
     /* SELECT first, last FROM person, address WHERE person.id = address.personId; */
@@ -82,7 +78,7 @@ object SampleApp extends Application with Logging {
       address <- Address if person.id is address.personId
     } yield person.first ~ person.last
 
-    logger info ("Executing: " + query5.selectStatement)
+    logger info "Executing: %s".format(query5.selectStatement)
     //query5 foreach { println }
 
 
@@ -93,7 +89,7 @@ object SampleApp extends Application with Logging {
       address <- Address if (address.location is "Musterhausen") && (person.id is address.personId)
     } yield person.first ~ address.location
 
-    logger info ("Executing: " + query6.selectStatement)
+    logger info "Executing: %s".format(query6.selectStatement)
     //query6 foreach { println }
 
     /* SELECT p.id, a.personId FROM person p, address a */
@@ -102,7 +98,7 @@ object SampleApp extends Application with Logging {
       address <- Address
     } yield person.id ~ address.personId
 
-    logger info ("Executing: " + query7.selectStatement)
+    logger info "Executing: %s".format(query7.selectStatement)
     //query7 foreach { println }
   }
 }
@@ -120,6 +116,6 @@ object Address extends Table[(Int, Int, String, String, String)]("address") {
   def zipCode = column[String]("zipCode")
   def location = column[String]("location")
   def personId = column[Int]("personId", O NotNull)
-  def personId_fk = foreignKey("personId_fk", personId, Person)(_.id)
+  def personIdFk = foreignKey("personIdFk", personId, Person)(_.id)
   def * = id ~ personId ~ street ~ zipCode ~ location
 }
