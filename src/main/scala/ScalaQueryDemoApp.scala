@@ -12,18 +12,19 @@ object ScalaQueryDemoApp extends Application with Logging {
 
   // val db = Database.forURL("jdbc:postgresql://localhost:5432/sq_demo", "postgres", "postgres", driver = "org.postgresql.Driver")
   val db = Database.forURL("jdbc:h2:mem:sq_demo", driver = "org.h2.Driver")
+  def DDL = Student.ddl ++ Professor.ddl ++ Course.ddl ++ StudentAttendsCourse.ddl
 
   db withSession {
-    def DDL = Student.ddl ++ Professor.ddl ++ Course.ddl ++ StudentAttendsCourse.ddl
     DDL.create
     DDL.createStatements foreach { logger info _ }
 
     /* Filling tables with data. */
-    Student.matrnr ~ Student.name ~ Student.surname insertAll (
+    Student insertAll (
       (2801, "Marcel", "Schmidt"),
       (2802, "Dirk","Meyer"),
       (2803, "Stefan", "Meier")
     )
+
     logger info "%s".format(Student.insertStatement)
 
     Professor.title ~ Professor.surname insertAll (
@@ -56,7 +57,7 @@ object ScalaQueryDemoApp extends Application with Logging {
     val allStudents = for { student <- Student } yield student
     logger info "%s".format(allStudents.selectStatement)
     allStudents foreach { println }
-
+    
     /* Printing out all student names. */
     logger info "%s".format(Student.map{_.name}.selectStatement)
     Student map { _.name } foreach { println }
@@ -81,6 +82,11 @@ object ScalaQueryDemoApp extends Application with Logging {
     val oneStudent2 = Student where { _.matrnr is 2801 }
     logger info "%s".format(oneStudent2.selectStatement)
     oneStudent2 foreach { println }
+
+    /* Listing all courses where professorId is 2, using the createFinderBy method. */
+    val findCourse = Course.createFinderBy(_.professorId)
+    logger info "Running: %s".format(findCourse.selectStatement)
+    findCourse.list(2) foreach { println }
 
     /* Selecting surname from student ordered asc by surname. */
     val studentSurname = for {
@@ -184,7 +190,7 @@ object ScalaQueryDemoApp extends Application with Logging {
     /* Deleting the student */
     deleteStudent mutate { m => m.delete }
     logger info "%s".format(deleteStudent.deleteStatement)
-
+    
     allStudents foreach { println }
 
     /* Updating a row only if student with matrnr 2801 exists. */

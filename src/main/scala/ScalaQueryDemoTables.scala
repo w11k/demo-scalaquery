@@ -3,7 +3,7 @@ package com.weiglewilczek.demoscalaquery
 import org.scalaquery.ql.extended.{ ExtendedTable => Table }
 
 object Student extends Table[(Int, String, String)]("student") {
-  def matrnr = column[Int]("matrnr", O PrimaryKey, O NotNull)
+  def matrnr = column[Int]("matrnr", O PrimaryKey, O NotNull, O DBType "int(4)")
   def name = column[String]("name")
   def surname = column[String]("surname")
   def * = matrnr ~ name ~ surname
