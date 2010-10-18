@@ -15,8 +15,9 @@ object ScalaQueryDemoApp extends Application with Logging {
   def DDL = Student.ddl ++ Professor.ddl ++ Course.ddl ++ StudentAttendsCourse.ddl
 
   db withSession {
-    DDL.create
     DDL.createStatements foreach { logger info _ }
+    DDL.create
+        
 
     /* Filling tables with data. */
     Student insertAll (
@@ -46,13 +47,14 @@ object ScalaQueryDemoApp extends Application with Logging {
 
     StudentAttendsCourse.studentMatrnr ~ StudentAttendsCourse.courseId insertAll (
       (2801, 1),
-      (2801, 3),
+      (2801, 2),
       (2803, 2),
       (2802, 2),
       (2803, 3)
     )
     logger info "%s".format(StudentAttendsCourse.insertStatement)
 
+/*
     /* Selecting everything from student. */
     val allStudents = for { student <- Student } yield student
     logger info "%s".format(allStudents.selectStatement)
@@ -77,6 +79,7 @@ object ScalaQueryDemoApp extends Application with Logging {
     val oneStudent = for { student <- Student if student.matrnr is 2801 } yield student
     logger info "%s".format(oneStudent.selectStatement)
     oneStudent foreach { println }
+    
 
     /* Same as above. */
     val oneStudent2 = Student where { _.matrnr is 2801 }
@@ -199,7 +202,16 @@ object ScalaQueryDemoApp extends Application with Logging {
     // TODO Acquire a update statement from example above?
 
     allStudents foreach { println }
+    allStudents.execute
+*/
+    Student filter { _.matrnr is 2801 } foreach { println }
+    Student filter { _.matrnr is "2801" } foreach { println }
+    val tmp = for { s <- Student if s.matrnr is "string" } yield s
+    println(tmp.selectStatement)
+    val tmpBreak = for { s <- Student if s.name is 2 } yield s
+    println(tmpBreak.selectStatement)
 
     DDL.drop
+    
   }
 }
