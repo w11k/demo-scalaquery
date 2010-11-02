@@ -54,7 +54,6 @@ object ScalaQueryDemoApp extends Application with Logging {
     )
     logger info "%s".format(StudentAttendsCourse.insertStatement)
 
-/*
     /* Selecting everything from student. */
     val allStudents = for { student <- Student } yield student
     logger info "%s".format(allStudents.selectStatement)
@@ -202,14 +201,9 @@ object ScalaQueryDemoApp extends Application with Logging {
     // TODO Acquire a update statement from example above?
 
     allStudents foreach { println }
-    allStudents.execute
-*/
+
+    /* Using collection methods thanks to the Query Monad. */
     Student filter { _.matrnr is 2801 } foreach { println }
-    Student filter { _.matrnr is "2801" } foreach { println }
-    val tmp = for { s <- Student if s.matrnr is "string" } yield s
-    println(tmp.selectStatement)
-    val tmpBreak = for { s <- Student if s.name is 2 } yield s
-    println(tmpBreak.selectStatement)
 
     DDL.drop
     
